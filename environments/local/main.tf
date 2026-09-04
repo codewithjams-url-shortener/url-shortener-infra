@@ -39,3 +39,8 @@ module "eks_cluster" {
   source = "../../modules/eks-cluster"
   cluster_name = "url-shortener-local"
 }
+
+module "dynamodb_table" {
+  source = "../../modules/dynamodb-table"
+  table_name = "Links"
+}
