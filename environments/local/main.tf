@@ -29,6 +29,13 @@ provider "aws" {
     elasticache = "http://localhost:4566"
     secretsmanager = "http://localhost:4566"
     eks = "http://localhost:4566"
+    iam = "http://localhost:4566"
+    ec2 = "http://localhost:4566"
   }
 
+}
+
+module "eks_cluster" {
+  source = "../../modules/eks-cluster"
+  cluster_name = "url-shortener-local"
 }
