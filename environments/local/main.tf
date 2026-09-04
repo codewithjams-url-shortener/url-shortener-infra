@@ -7,6 +7,11 @@ terraform {
       version = "~> 6.0"
     }
 
+    random = {
+      source = "hashicorp/random"
+      version = "~> 3.6"
+    }
+
   }
 
 }
@@ -43,4 +48,8 @@ module "eks_cluster" {
 module "dynamodb_table" {
   source = "../../modules/dynamodb-table"
   table_name = "Links"
+}
+
+module "rds_postgres" {
+  source = "../../modules/rds-postgres"
 }
