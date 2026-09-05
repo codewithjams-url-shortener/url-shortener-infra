@@ -65,3 +65,7 @@ module "s3_bucket" {
 module "sns_sqs" {
   source = "../../modules/sns-sqs"
 }
+
+module "secrets_manager" {
+  source = "../../modules/secretsmanager"
+}
