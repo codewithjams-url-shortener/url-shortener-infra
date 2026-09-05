@@ -53,3 +53,7 @@ module "dynamodb_table" {
 module "rds_postgres" {
   source = "../../modules/rds-postgres"
 }
+
+module "elasticache_redis" {
+  source = "../../modules/elasticache-redis"
+}
