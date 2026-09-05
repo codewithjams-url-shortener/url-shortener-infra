@@ -61,3 +61,7 @@ module "elasticache_redis" {
 module "s3_bucket" {
   source = "../../modules/s3-bucket"
 }
+
+module "sns_sqs" {
+  source = "../../modules/sns-sqs"
+}
