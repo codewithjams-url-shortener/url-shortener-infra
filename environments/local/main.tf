@@ -57,3 +57,7 @@ module "rds_postgres" {
 module "elasticache_redis" {
   source = "../../modules/elasticache-redis"
 }
+
+module "s3_bucket" {
+  source = "../../modules/s3-bucket"
+}
