@@ -165,3 +165,70 @@ run "rejects_an_empty_set_of_environments" {
   expect_failures = [var.environment_names]
 
 }
+
+run "attaches_no_monitor_by_default" {
+
+  command = plan
+
+  variables {
+    service_name = "test-service"
+    environment_names = ["local"]
+  }
+
+  assert {
+    condition = length(aws_appconfig_environment.service["local"].monitor) == 0
+    error_message = "Without an alarm no monitor may be attached, or deployments could never finish"
+  }
+
+}
+
+run "attaches_the_alarm_as_a_monitor_to_every_environment_when_given" {
+
+  command = plan
+
+  variables {
+    service_name = "test-service"
+    environment_names = ["local", "aws"]
+    alarm_arn = "arn:aws:cloudwatch:us-west-2:000000000000:alarm:test-service-5xx-rate"
+    monitor_role_arn = "arn:aws:iam::000000000000:role/test-service-appconfig-monitor"
+  }
+
+  assert {
+    condition = alltrue([
+      for environment in aws_appconfig_environment.service :
+      length(environment.monitor) == 1
+      && one(environment.monitor).alarm_arn == "arn:aws:cloudwatch:us-west-2:000000000000:alarm:test-service-5xx-rate"
+      && one(environment.monitor).alarm_role_arn == "arn:aws:iam::000000000000:role/test-service-appconfig-monitor"
+    ])
+    error_message = "Every Environment must watch the alarm through the given role"
+  }
+
+}
+
+run "rejects_an_alarm_without_a_role_to_read_it" {
+
+  command = plan
+
+  variables {
+    service_name = "test-service"
+    environment_names = ["local"]
+    alarm_arn = "arn:aws:cloudwatch:us-west-2:000000000000:alarm:test-service-5xx-rate"
+  }
+
+  expect_failures = [var.monitor_role_arn]
+
+}
+
+run "rejects_a_role_without_an_alarm_to_read" {
+
+  command = plan
+
+  variables {
+    service_name = "test-service"
+    environment_names = ["local"]
+    monitor_role_arn = "arn:aws:iam::000000000000:role/test-service-appconfig-monitor"
+  }
+
+  expect_failures = [var.monitor_role_arn]
+
+}

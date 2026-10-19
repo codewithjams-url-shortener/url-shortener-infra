@@ -25,3 +25,21 @@ variable "config_schema" {
   type = string
   default = null
 }
+
+variable "alarm_arn" {
+  description = "ARN of the CloudWatch alarm AppConfig watches while a deployment bakes, rolling it back if it fires. Null attaches none, so deployments are never rolled back automatically. Comes with monitor_role_arn from the cloudwatch-alarm module (ADR-0011)"
+  type = string
+  default = null
+}
+
+variable "monitor_role_arn" {
+  description = "ARN of the IAM role AppConfig assumes to read alarm_arn. Required with it and meaningless without it"
+  type = string
+  default = null
+
+  validation {
+    condition = (var.alarm_arn == null) == (var.monitor_role_arn == null)
+    error_message = "alarm_arn and monitor_role_arn must be given together: AppConfig cannot read an alarm without a role, and a role with no alarm does nothing"
+  }
+
+}
