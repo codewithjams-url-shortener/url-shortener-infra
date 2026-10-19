@@ -36,6 +36,7 @@ provider "aws" {
     eks = "http://localhost:4566"
     iam = "http://localhost:4566"
     ec2 = "http://localhost:4566"
+    appconfig = "http://localhost:4566"
   }
 
 }
@@ -68,4 +69,11 @@ module "sns_sqs" {
 
 module "secrets_manager" {
   source = "../../modules/secretsmanager"
+}
+
+module "appconfig" {
+  source = "../../modules/appconfig"
+  for_each = toset(["url-service", "redirect-service", "analytics-service"])
+  service_name = each.key
+  environment_names = ["local"]
 }
