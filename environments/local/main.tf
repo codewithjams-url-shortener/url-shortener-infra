@@ -37,6 +37,7 @@ provider "aws" {
     iam = "http://localhost:4566"
     ec2 = "http://localhost:4566"
     appconfig = "http://localhost:4566"
+    cloudwatch = "http://localhost:4566"
   }
 
 }
@@ -71,9 +72,21 @@ module "secrets_manager" {
   source = "../../modules/secretsmanager"
 }
 
+locals {
+  services = toset(["url-service", "redirect-service", "analytics-service"])
+}
+
+module "cloudwatch_alarm" {
+  source = "../../modules/cloudwatch-alarm"
+  for_each = local.services
+  service_name = each.key
+}
+
 module "appconfig" {
   source = "../../modules/appconfig"
-  for_each = toset(["url-service", "redirect-service", "analytics-service"])
+  for_each = local.services
   service_name = each.key
   environment_names = ["local"]
+  alarm_arn = module.cloudwatch_alarm[each.key].alarm_arn
+  monitor_role_arn = module.cloudwatch_alarm[each.key].monitor_role_arn
 }

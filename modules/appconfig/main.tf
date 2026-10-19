@@ -9,6 +9,18 @@ resource "aws_appconfig_environment" "service" {
   application_id = aws_appconfig_application.service.id
   name = each.key
   description = "The ${each.key} environment of ${var.service_name}'s runtime configuration"
+
+  # While a deployment bakes AppConfig watches this alarm and rolls the deployment back if it fires (ADR-0011).
+  dynamic "monitor" {
+    for_each = var.alarm_arn == null ? [] : [var.alarm_arn]
+
+    content {
+      alarm_arn = monitor.value
+      alarm_role_arn = var.monitor_role_arn
+    }
+
+  }
+
 }
 
 resource "aws_appconfig_configuration_profile" "runtime_settings" {
